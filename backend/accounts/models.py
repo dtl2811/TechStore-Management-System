@@ -112,3 +112,41 @@ class Address(models.Model):
 
     def __str__(self):
         return f'{self.receiver_name} - {self.address_line}'
+
+
+class Review(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        db_column='customer_id',
+        related_name='reviews'
+    )
+
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        db_column='product_id',
+        related_name='reviews'
+    )
+
+    order_item = models.ForeignKey(
+        'orders.OrderItem',
+        on_delete=models.CASCADE,
+        db_column='order_item_id',
+        related_name='reviews'
+    )
+
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=30, default='PENDING')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'reviews'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.customer.full_name} - {self.product.name}'

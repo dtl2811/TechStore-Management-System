@@ -68,3 +68,57 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f'Cart {self.cart_id} - {self.product_variant.sku}'
+
+
+class Wishlist(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        db_column='customer_id',
+        related_name='wishlists'
+    )
+
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'wishlists'
+
+    def __str__(self):
+        return f'Wishlist #{self.id}'
+
+
+class WishlistItem(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+    wishlist = models.ForeignKey(
+        Wishlist,
+        on_delete=models.CASCADE,
+        db_column='wishlist_id',
+        related_name='items'
+    )
+
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        db_column='product_id',
+        related_name='wishlist_items'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'wishlist_items'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['wishlist', 'product'],
+                name='unique_wishlist_product'
+            )
+        ]
+
+    def __str__(self):
+        return f'Wishlist #{self.wishlist_id} - {self.product.name}'

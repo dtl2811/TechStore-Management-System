@@ -33,3 +33,33 @@ class Promotion(models.Model):
 
     def __str__(self):
         return self.code
+    
+
+class PromotionProduct(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+    promotion = models.ForeignKey(
+        Promotion,
+        on_delete=models.CASCADE,
+        db_column='promotion_id',
+        related_name='promotion_products'
+    )
+
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        db_column='product_id',
+        related_name='promotion_products'
+    )
+
+    class Meta:
+        db_table = 'promotion_products'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['promotion', 'product'],
+                name='unique_promotion_product'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.promotion.code} - {self.product.name}'
